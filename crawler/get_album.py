@@ -35,7 +35,7 @@ def get_album_info(album_id=None, url=None):
         
         # 先看看是song还是album
         if url.find('album') == -1:
-            print("没给专辑 URL")
+            print("没给专辑 URL或者不是专辑")
             return None
         print(f"给了专辑 URL: {url}")
         url = url.split('&')[0]

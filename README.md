@@ -1,95 +1,138 @@
-# While-Listening-to-Albums
+# While-Listening-to-Albums 听专辑的时候我在想些什么
+
 听专辑的时候我在想些什么（While Listening to Albums）是一款听歌记录软件，旨在帮助用户记录和分享他们在听专辑时的想法和感受。用户可以搜索专辑，查看专辑详情，记录自己的听歌笔记，并与其他用户分享。
 
+While Listening to Albums is a music journaling app that helps users record and share their thoughts and feelings while listening to albums. You can search for albums, view album details, write your own listening notes, and share them with others.
+
 ## Features 功能
+
 你或许会觉得，这款软件和豆瓣很像，其实确实如此。豆瓣的专辑页面也有类似的功能，但我希望在这个基础上，增加一些新的功能，比如：
-- 完全私人化的听歌笔记和乐评，你可以选择完全不公开任何体验
-- 更加细分的评分规则，不是1-5星，而是1-10分
-- 使用专辑封面拼图”我听过的所有专辑“，“我2023年听过的专辑”等等
-    - 可以一键导出拼图
-    - 给专辑增加“简单印象”，比如一个词，一个颜色，可以直接在拼图上显示
-    - 也可以做成“月历”，这样的话就会有些空位
-- 对于任何专辑都能直接跳转到对应的流媒体
-    - Spotify
-    - 网易云
-    - ……
-- “那年今日”功能，推荐去年今天你听过的专辑和你当时的评分
-- 评分热力图。像是Github的贡献热力图一样，记录你每天听了多少专辑
-    - 所以或许我们会对于每个用户允许每首歌都有很多条“听歌记录”，而不是一首歌只有一条、
-    - 不如让我们做个带图片的时间轴
-- 评分曲线图
-    - 你可以看到你在不同时间段的评分变化
-    - 我最近变成“懂哥”了吗？我最近变得“苛刻”了吗？
-- 不仅是“我听过的专辑”，还有“我想听的专辑”
-    - 你可以把你想听的专辑添加到“想听”列表，同样你也能一键跳转到对应的流媒体
-- 提醒。
-    - 如果你愿意留下你的邮箱，我们可以在你标注想听后的某个时间点，给你发一封邮件，提醒你去听这张专辑
 
+At first glance, this app may remind you of Douban’s album pages, and that’s true — the idea is similar. But I’d like to expand on that foundation with new features such as:
 
-
+- 完全私人化的听歌笔记和乐评，你可以选择完全不公开任何体验。Private listening notes and reviews: you can choose to keep all of your experiences completely private.
+- 更加细分的评分规则，不是 1-5 星，而是 1-10 分。More granular rating scale: not just 1–5 stars, but a 1–10 score system.
+  - 你当然可以使用小数点。You can absolutely use decimal scores.
+- 使用专辑封面拼图”我听过的所有专辑“，“我 2023 年听过的专辑”等等。Album cover collages: create mosaics like “All the albums I’ve listened to” or “Albums I listened to in 2023.”
+  - 可以一键导出拼图。Export collages with one click.
+  - 给专辑增加“简单印象”，比如一个词，一个颜色，可以直接在拼图上显示。Add a “quick impression” (a word, a color) to each album, displayed directly on the collage.
+  - 也可以做成“月历”，这样的话就会有些空位。Optionally display them as a calendar view, with empty slots for days you didn’t log albums.
+- 对于任何专辑都能直接跳转到对应的流媒体。Jump directly to streaming platforms for any album:
+  - Spotify
+  - 网易云。NetEase Cloud Music
+  - ……and more
+- “那年今日”功能，推荐去年今天你听过的专辑和你当时的评分。“On This Day” reminders: revisit what you were listening to exactly one year ago, along with your old rating.
+- 评分热力图。像是 Github 的贡献热力图一样，记录你每天听了多少专辑。Listening activity heatmap: inspired by GitHub’s contribution graph, showing how many albums you listened to each day.
+  - 所以或许我们会对于每个用户允许每首歌都有很多条“听歌记录”，而不是一首歌只有一条。Each track can have multiple “listening logs,” rather than just one.
+  - 不如让我们做个带图片的时间轴。A timeline view with album covers and notes.
+- 评分曲线图。Rating trends and charts:
+  - 你可以看到你在不同时间段的评分变化。Visualize how your ratings change over time.
+  - 我最近变成“懂哥”了吗？我最近变得“苛刻”了吗？See if you’re becoming more generous… or more critical.
+- 不仅是“我听过的专辑”，还有“我想听的专辑”。Want-to-listen list:
+  - 你可以把你想听的专辑添加到“想听”列表，同样你也能一键跳转到对应的流媒体。Add albums you’d like to check out, with one-click access to streaming services.
+- 提醒。Reminders by email:
+  - 如果你愿意留下你的邮箱，我们可以在你标注想听后的某个时间点，给你发一封邮件，提醒你去听这张专辑。If you leave your email, we can notify you at a chosen time after you add an album to your “Want to Listen” list, reminding you to give it a spin.
 
 ## Project Overview 项目概览
 
 ### Structure 结构
-Generated by ai right now, and I will modify it later.
+
+Generated by ai right now, and I will modify it later. Another `.md` file (`run-local.md`)also contains important information.
 
 ```bash
 While-Listening-to-Albums/
-├── client/                       # 🎧 前端 React 应用（Vite）
+├── client/                         # 🎧 前端 React (Vite)
 │   ├── public/
 │   ├── src/
-│   │   ├── components/           # 复用组件
-│   │   ├── pages/                # 页面：主页、专辑详情等
+│   │   ├── components/            # 可复用组件
+│   │   ├── pages/                 # 页面：Home, AlbumDetail, Profile 等
+│   │   ├── api/                   # 前端请求封装（基于 fetch/axios + React Query）
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── vite.config.js
-│   ├── .env                      # VITE_API_URL=http://localhost:8080
+│   ├── .env.example               # VITE_API_URL=http://localhost:8080
 │   └── package.json
 │
-├── server/                       # 🚀 Java 后端（Spring Boot）
+├── server/                         # 🚀 后端 Node.js + Express
 │   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/yourapp/
-│   │   │   │   ├── controller/   # AlbumController.java
-│   │   │   │   ├── model/        # Album.java
-│   │   │   │   ├── service/      # AlbumService.java
-│   │   │   │   └── AlbumApp.java # 主类（Spring Boot 启动入口）
-│   │   │   └── resources/
-│   │   │       ├── application.yml # MongoDB 配置
-│   │   │       └── static/       # 可用于部署前端构建产物（可选）
-│   └── pom.xml
+│   │   ├── app.js                 # 挂载中间件/路由
+│   │   ├── server.js              # 启动入口
+│   │   ├── db/                    # Mongo 连接与模型
+│   │   │   ├── index.js           # 复用的 MongoClient 连接池
+│   │   │   └── models/
+│   │   │       ├── Album.js
+│   │   │       ├── Note.js        # 听歌笔记/乐评
+│   │   │       ├── User.js
+│   │   │       └── ListenLog.js   # 听歌记录（做热力图/时间轴）
+│   │   ├── routes/
+│   │   │   ├── albums.js          # /api/albums  搜索/详情/跳转流媒体
+│   │   │   ├── notes.js           # /api/notes   私密/公开笔记、评分(1–10，含小数)
+│   │   │   ├── logs.js            # /api/logs    听歌记录、热力图、那年今日
+│   │   │   └── users.js           # /api/users   注册/登录(可选)
+│   │   ├── services/              # 业务逻辑（与路由解耦）
+│   │   ├── utils/
+│   │   │   ├── cors.js            # CORS 白名单（Vercel 前端域名）
+│   │   │   ├── rateLimit.js       # 简易限流（防滥用/外部API保护）
+│   │   │   └── streamingLinks.js  # Spotify/网易云链接生成
+│   │   └── middleware/
+│   │       ├── error.js           # 统一错误处理
+│   │       └── auth.js            # JWT（可选）
+│   ├── .env.example               # MONGODB_URI=...  PORT=8080  JWT_SECRET=...
+│   ├── package.json
+│   └── swagger.yaml               # API 文档（可选）
 │
-├── crawler/                      # 🐍 Python 爬虫（专辑抓取）
-│   ├── get_album.py              # 主爬虫入口
-│   ├── album.py                  # AlbumModel 封装（已有）
-│   ├── .env                      # netEaseGetterDSN = Mongo URI
-│   └── requirements.txt
+├── crawler/                        # 🐍 或 🟩 爬虫/数据导入（两种选一）
+│   ├── python/                     # 保留你的 Python 版
+│   │   ├── get_album.py
+│   │   ├── album.py
+│   │   ├── .env.example           # netEaseGetterDSN=MONGO_URI
+│   │   └── requirements.txt
+│   └── node/                       # Node 版本（如需统一 JS 生态）
+│       ├── fetchAlbums.mjs
+│       ├── .env.example           # MONGODB_URI=...
+│       └── package.json
+│
+├── common/                         # 前后端共享类型/常量（可选）
+│   ├── constants.js
+│   └── schemas.md                 # 数据表结构说明/索引设计
+│
+├── scripts/                        # 一次性脚本（建索引/导入数据）
+│   ├── seed.mjs
+│   └── create-indexes.mjs
 │
 ├── .gitignore
 ├── README.md
-└── run-local.md                  # 本地开发说明文档
+└── run-local.md                    # 本地开发说明
 ```
 
 ## Local Development 本地开发
-这个项目是一个前后端分离的应用，前端使用 React 和 Vite，后端使用 Java 和 Spring Boot，脚本使用 Python 和 MongoDB。以下是本地开发的步骤：
+
+这是一个 MERN 开源项目（MongoDB + Express + React + Node.js），具体部署如下：
+
+- 前端：Vercel
+- 后端：Zeabur
+- 数据库：MongoDB Atlas
+  如果你想 contribute 或者魔改自己的版本，请参考`run-local.md`进行开发。
 
 1. 克隆这个仓库到本地并且`cd`到项目目录
 
 2. 安装前端依赖
+
 ```bash
 cd client
 npm install
 ```
 
 3. 安装后端依赖
+
 ```bash
 cd server
 ./mvnw install
 ```
 
 4. 安装爬虫依赖
+
 ```bash
 cd crawler
 pip install -r requirements.txt
 ```
-
