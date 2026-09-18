@@ -1,95 +1,163 @@
-# While-Listening-to-Albums 听专辑的时候我在想些什么
+<div align="center">
 
-听专辑的时候我在想些什么（While Listening to Albums）是一款听歌记录软件，旨在帮助用户记录和分享他们在听专辑时的想法和感受。用户可以搜索专辑，查看专辑详情，记录自己的听歌笔记，并与其他用户分享。
+# While Listening to Albums
 
-While Listening to Albums is a music journaling app that helps users record and share their thoughts and feelings while listening to albums. You can search for albums, view album details, write your own listening notes, and share them with others.
+**A private-first music journal: log the albums you listen to, rate them, and write down what you were thinking.**
 
-## Features 功能
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-8-47A248?logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
-你或许会觉得，这款软件和豆瓣很像，其实确实如此。豆瓣的专辑页面也有类似的功能，但我希望在这个基础上，增加一些新的功能，比如：
+**English** · [简体中文](README.zh-CN.md)
 
-At first glance, this app may remind you of Douban’s album pages, and that’s true — the idea is similar. But I’d like to expand on that foundation with new features such as:
+</div>
 
-- 完全私人化的听歌笔记和乐评，你可以选择完全不公开任何体验。Private listening notes and reviews: you can choose to keep all of your experiences completely private.
-- 更加细分的评分规则，不是 1-5 星，而是 1-10 分。More granular rating scale: not just 1–5 stars, but a 1–10 score system.
-  - 你当然可以使用小数点。You can absolutely use decimal scores.
-- 使用专辑封面拼图”我听过的所有专辑“，“我 2023 年听过的专辑”等等。Album cover collages: create mosaics like “All the albums I’ve listened to” or “Albums I listened to in 2023.”
-  - 可以一键导出拼图。Export collages with one click.
-  - 给专辑增加“简单印象”，比如一个词，一个颜色，可以直接在拼图上显示。Add a “quick impression” (a word, a color) to each album, displayed directly on the collage.
-  - 也可以做成“月历”，这样的话就会有些空位。Optionally display them as a calendar view, with empty slots for days you didn’t log albums.
-- 对于任何专辑都能直接跳转到对应的流媒体。Jump directly to streaming platforms for any album:
-  - Spotify
-  - 网易云。NetEase Cloud Music
-  - ……and more
-- “那年今日”功能，推荐去年今天你听过的专辑和你当时的评分。“On This Day” reminders: revisit what you were listening to exactly one year ago, along with your old rating.
-- 评分热力图。像是 Github 的贡献热力图一样，记录你每天听了多少专辑。Listening activity heatmap: inspired by GitHub’s contribution graph, showing how many albums you listened to each day.
-  - 所以或许我们会对于每个用户允许每首歌都有很多条“听歌记录”，而不是一首歌只有一条。Each track can have multiple “listening logs,” rather than just one.
-  - 不如让我们做个带图片的时间轴。A timeline view with album covers and notes.
-- 评分曲线图。Rating trends and charts:
-  - 你可以看到你在不同时间段的评分变化。Visualize how your ratings change over time.
-  - 我最近变成“懂哥”了吗？我最近变得“苛刻”了吗？See if you’re becoming more generous… or more critical.
-- 不仅是“我听过的专辑”，还有“我想听的专辑”。Want-to-listen list:
-  - 你可以把你想听的专辑添加到“想听”列表，同样你也能一键跳转到对应的流媒体。Add albums you’d like to check out, with one-click access to streaming services.
-- 提醒。Reminders by email:
-  - 如果你愿意留下你的邮箱，我们可以在你标注想听后的某个时间点，给你发一封邮件，提醒你去听这张专辑。If you leave your email, we can notify you at a chosen time after you add an album to your “Want to Listen” list, reminding you to give it a spin.
+---
 
-## Project Overview 项目概览
+## Overview
 
-### Status 进度
+While Listening to Albums (听专辑的时候我在想些什么) is a self-hostable web app for people who listen to albums front to back and want to remember what they thought. Search an album once and get it from **Spotify and NetEase Cloud Music at the same time**, add it to your list, and write listening notes that stay private unless you decide otherwise.
 
-项目的骨架迁移自我的 AIT 期末项目 Rewind Archive（去掉了影视部分，保留 Spotify 部分），并且接入了网易云爬虫。目前已经完成：
+It is similar in spirit to the album pages of Douban, with a different set of priorities: your notes are yours, ratings are finer than five stars, and every album links straight to where you can play it.
 
-The skeleton is migrated from my AIT final project Rewind Archive (screen part removed, Spotify part kept), with the NetEase crawler plugged in. Done so far:
+## Features
 
-- 搜索：同时搜 Spotify 和网易云，两边的同一张专辑会合并成一条结果，带两个平台的跳转链接。Search Spotify and NetEase at once; the same album on both platforms is merged into one result with both streaming links.
-- 直接贴一个网易云专辑链接也可以：爬虫先抓专辑信息，再去 Spotify 找对应的专辑。Pasting a NetEase album link works too: the crawler fetches the album, then the server looks it up on Spotify.
-- 把搜索结果加入“我的音乐”，专辑/单曲列表、详情页。Add results to your music, album / single lists, detail page.
-- Blog（听歌笔记），可以关联多张专辑，1-10 分并且支持小数。Blogs (listening notes) referring to multiple albums, rated 1-10 with decimals.
+- **Accounts** — register and log in with a username or email. Passwords are hashed with bcrypt, sessions are JWTs, and login attempts are rate limited.
+- **One search, two platforms** — a keyword is searched on Spotify and NetEase Cloud Music concurrently. The same album found on both sides is merged into a single result that carries both streaming links. If one platform is down, you still get the other.
+- **Paste a NetEase link** — give the search box a NetEase album URL; the crawler reads the album and the server looks up its Spotify counterpart.
+- **Your own list** — albums and singles you add belong to your account. The album catalog is shared between users, your list is not.
+- **Listening notes** — write blogs that refer to one or more albums, rated from 1 to 10 with decimals. **Private by default**; a note can be made public and shared by link.
+- **Jump to streaming** — every album links to Spotify and/or NetEase Cloud Music.
+- **Unicode-friendly** — Chinese, Japanese and Korean titles work everywhere, including URLs.
 
-### Structure 结构
+## Roadmap
+
+- [ ] Album cover collages ("everything I listened to in 2026"), exportable with one click, with a one-word or one-color "quick impression" per album
+- [ ] Calendar view of the collage, with empty slots for quiet days
+- [ ] "On This Day": what you were listening to a year ago, and how you rated it
+- [ ] Listening heatmap in the style of the GitHub contribution graph, backed by multiple listening logs per album
+- [ ] Timeline view with covers and notes
+- [ ] Rating trends: are you becoming more generous, or more critical?
+- [ ] Want-to-listen list, with optional email reminders
+- [ ] More streaming platforms
+
+## Quick Start
+
+The only requirement is [Docker](https://docs.docker.com/get-docker/).
 
 ```bash
-While-Listening-to-Albums/
-├── client/                         # 前端 React (Vite) + react-router
-│   └── src/
-│       ├── components/             # Tabs, SearchBar, FloatingButton, StreamingLinks
-│       ├── pages/                  # MusicList, AlbumList, SingleList, MusicDetail, MusicSearch, BlogList, BlogNew, BlogDetail
-│       ├── lib/api.js              # apiFetch，VITE_API_BASE 可以指向别的后端
-│       ├── App.jsx                 # 路由
-│       └── main.jsx
-│
-├── server/                         # 后端 Node.js + Express + Mongoose
-│   ├── src/
-│   │   ├── app.mjs                 # 入口：挂载路由，serve client/dist
-│   │   ├── config.mjs              # 读 .env（根目录或者 server/ 都可以）
-│   │   ├── models/db.mjs           # Artist, Music, Blog
-│   │   ├── routes/
-│   │   │   ├── musicRoutes.mjs     # /api/v1/music  all, :slug, search, add
-│   │   │   └── blogRoutes.mjs      # /api/v1/blog   all, :slug, create
-│   │   └── services/
-│   │       ├── spotify.mjs         # Spotify Web API（token 自动刷新）
-│   │       ├── netease.mjs         # 用子进程调用 crawler/cli.py
-│   │       └── merge.mjs           # 合并 Spotify 和网易云的搜索结果
-│   └── test/                       # Mocha + Chai (+ mongodb-memory-server)
-│
-├── crawler/                        # 🐍 网易云爬虫
-│   ├── get_album.py                # get_album_info / search_albums，直接运行是交互模式（会存库）
-│   ├── cli.py                      # 给后端用的入口，stdout 只输出 JSON
-│   ├── models/albums.py
-│   ├── .env.example                # netEaseGetterDSN=MONGO_URI（只有交互模式需要）
-│   └── requirements.txt
-│
-├── .env.example                    # DSN, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, PORT
-├── package.json                    # npm start 同时启动前后端
-├── run.sh                          # 一键 build + test + start（部署用）
-├── Dockerfile                      # 前端 build + Express + Python 爬虫 打成一个镜像
-├── docker-compose.yml              # docker compose up --build：app + mongo
-├── README.md
-└── run-local.md                    # 本地开发说明
+git clone https://github.com/SuQichen777/While-Listening-to-Albums.git
+cd While-Listening-to-Albums
+cp .env.example .env
 ```
 
-## Local Development 本地开发
+Fill in `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `JWT_SECRET` in `.env`, then:
 
-这是一个 MERN 开源项目（MongoDB + Express + React + Node.js），外加一个 Python 爬虫。如果你想 contribute 或者魔改自己的版本，请参考 [`run-local.md`](run-local.md)。
+```bash
+docker compose up --build -d
+```
 
-This is a MERN project (MongoDB + Express + React + Node.js) plus a Python crawler. See [`run-local.md`](run-local.md) for how to run it locally.
+Open <http://localhost:3000> and register an account.
+
+> [!NOTE]
+> Spotify requires the owner of a Spotify app to have an active Premium subscription, otherwise its Web API answers `403`. The app keeps working in that case: the search page shows a warning and lists NetEase results only.
+
+To run the pieces without Docker, see **[Local Development](docs/local-development.md)**.
+
+## How Search Works
+
+```mermaid
+flowchart LR
+    U[Search box] -->|keyword or NetEase album URL| S[Express API]
+    S -->|Web API| SP[Spotify]
+    S -->|child process, JSON CLI| C[Python crawler]
+    C --> NE[NetEase Cloud Music]
+    SP --> M[Merge by normalized title,<br/>artist and release year]
+    C --> M
+    M -->|one result, both links| U
+```
+
+Both sources are queried concurrently and either one may fail independently. The response reports a status per source, so the client can tell the user what is missing instead of failing the whole search.
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 19, React Router 7, Vite |
+| Backend | Node.js, Express 4, Mongoose 8 |
+| Auth | bcrypt password hashing, JSON Web Tokens, express-rate-limit |
+| Database | MongoDB |
+| Crawler | Python 3, requests, BeautifulSoup |
+| External APIs | Spotify Web API, NetEase Cloud Music |
+| Testing | Mocha, Chai, SuperTest, mongodb-memory-server, ESLint |
+| Deployment | Docker (multi-stage build), Docker Compose |
+
+## Project Structure
+
+```text
+While-Listening-to-Albums/
+├── client/                     React app (Vite)
+│   └── src/
+│       ├── components/         Tabs, SearchBar, StreamingLinks, ProtectedRoute, ...
+│       ├── context/            AuthProvider, useAuth
+│       ├── pages/              Login, Register, MusicList, MusicSearch, MusicDetail, Blog*
+│       └── lib/api.js          fetch helper that attaches the login token
+├── server/                     Express API
+│   ├── src/
+│   │   ├── app.mjs             entry point, also serves client/dist
+│   │   ├── models/db.mjs       User, Artist, Music, Mark, Blog
+│   │   ├── middleware/auth.mjs JWT signing and requireAuth
+│   │   ├── routes/             authRoutes, musicRoutes, blogRoutes
+│   │   └── services/           spotify, netease (crawler bridge), merge
+│   └── test/                   Mocha + Chai + SuperTest
+├── crawler/                    NetEase Cloud Music crawler (Python)
+│   ├── get_album.py            album page / JSON API / search
+│   └── cli.py                  JSON command line used by the server
+├── docs/                       development guides
+├── Dockerfile
+└── docker-compose.yml
+```
+
+## API
+
+All endpoints live under `/api/v1`. Everything except `auth/register` and `auth/login` requires an `Authorization: Bearer <token>` header.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/auth/register` | Create an account, returns `{ token, user }` |
+| `POST` | `/auth/login` | Log in with username or email, returns `{ token, user }` |
+| `GET` | `/auth/me` | The user of the current token |
+| `POST` | `/music/search` | Search Spotify and NetEase by keyword or NetEase album URL |
+| `POST` | `/music/add` | Add one search result to your list |
+| `GET` | `/music/all` | Your list |
+| `GET` | `/music/:slug` | Album details |
+| `DELETE` | `/music/:slug` | Remove an album from your list |
+| `POST` | `/blog/create` | Write a listening note |
+| `GET` | `/blog/all` | Your notes |
+| `GET` | `/blog/:slug` | One note (your own, or a public one) |
+
+Request and response bodies are documented in [Local Development](docs/local-development.md#api).
+
+## Testing
+
+```bash
+npm test
+```
+
+The server suite covers the data models, registration and login, per-user data isolation, the search merge logic and the Spotify / NetEase mappers. It runs against an in-memory MongoDB, so no database is needed.
+
+## Contributing
+
+Issues and pull requests are welcome. Please run `npm test` and the linters (`npm --prefix server run lint`, `npm --prefix client run lint`) before opening a pull request.
+
+## Acknowledgements
+
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api)
+- [NetEase Cloud Music](https://music.163.com/) — this project is not affiliated with NetEase; the crawler only reads publicly available album metadata. Please use it responsibly.
+
+## License
+
+[MIT](LICENSE) © SuQichen777

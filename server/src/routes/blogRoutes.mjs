@@ -1,12 +1,17 @@
 import express from "express";
+import mongoose from "mongoose";
 import { Blog, Music } from "../models/db.mjs";
+import { requireAuth } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
-// Show all blogs
+// blogs are private: everything here belongs to a logged-in user
+router.use(requireAuth);
+
+// Show all my blogs
 router.get("/all", async (req, res) => {
   try {
-    const blogs = await Blog.find()
+    const blogs = await Blog.find({ author: req.user._id })
       .sort({ createDate: -1 })
       .select("-__v");
     res.json(blogs);
@@ -19,12 +24,15 @@ router.get("/all", async (req, res) => {
 // Specific Blog Detail Page
 router.get("/:slug", async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug }).lean(); // lean: 返回纯 JS 对象
+    const blog = await Blog.findOne({ slug: req.params.slug }).populate("author", "username").lean(); // lean: 返回纯 JS 对象
 
-    if (!blog) {
+    // someone else's private blog looks exactly like a missing one
+    const isMine = blog && blog.author && blog.author._id.equals(req.user._id);
+    if (!blog || (!isMine && !blog.isPublic)) {
       return res.status(404).json({ error: "Blog not found" });
     }
 
+    blog.isMine = Boolean(isMine);
     blog.referredWork = await Promise.all(
       (blog.referredWork || []).map(async (ref) => {
         const doc = await Music.findById(ref.item).select("title image artistName slug").lean();
@@ -41,26 +49,30 @@ router.get("/:slug", async (req, res) => {
 
 // Create a new blog
 router.post("/create", async (req, res) => {
-  const { title, content, rate, referredWork, referredWorkNumber } = req.body;
+  const { title, content, rate, referredWork, isPublic } = req.body;
   let { cover } = req.body;
 
-  if (!title || !content) {
+  if (typeof title !== "string" || typeof content !== "string" || !title.trim() || !content.trim()) {
     return res.status(400).json({ error: "Title and content are required." });
   }
 
-  if (rate && (rate < 0 || rate > 10)) {
+  if (rate && (typeof rate !== "number" || rate < 0 || rate > 10)) {
     return res.status(400).json({ error: "Rate must be between 0 and 10." });
   }
 
   if (referredWork && !Array.isArray(referredWork)) {
     return res.status(400).json({ error: "Referred work must be an array." });
   }
+  const works = (referredWork || []).map(work => ({ item: work?.item, referredModel: "Music" }));
+  if (works.some(work => !mongoose.isValidObjectId(work.item))) {
+    return res.status(400).json({ error: "Referred work is not a music." });
+  }
 
   try {
     // Check whether any referred work exists
-    if (!cover && referredWork && referredWork.length > 0) {
+    if (!cover && works.length > 0) {
       // Set the link of cover image to the first referred work
-      const music = await Music.findById(referredWork[0].item).select("image").lean();
+      const music = await Music.findById(works[0].item).select("image").lean();
       if (music) {
         cover = music.image;
       }
@@ -68,11 +80,13 @@ router.post("/create", async (req, res) => {
 
     const blog = new Blog({
       title,
-      cover: cover || "",
+      cover: typeof cover === "string" ? cover : "",
       content,
       rate: rate || 0,
-      referredWork: referredWork || [],
-      referredWorkNumber: referredWorkNumber || (referredWork ? referredWork.length : 0),
+      author: req.user._id,
+      isPublic: isPublic === true,
+      referredWork: works,
+      referredWorkNumber: works.length,
     });
 
     await blog.save();
