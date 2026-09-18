@@ -1,0 +1,33 @@
+# docker compose up --build
+# then open http://localhost:3000
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      # SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET come from here
+      - path: .env
+        required: false
+    environment:
+      # inside compose the database is always the mongo service below
+      DSN: mongodb://mongo:27017/while-listening-to-albums
+      PORT: 3000
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:8.2
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

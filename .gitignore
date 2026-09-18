@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Node
+node_modules
+*.local
+npm-debug.log*
+
+# client/src/lib is source code, not a Python build folder
+!client/src/lib/
+
+# macOS
+.DS_Store

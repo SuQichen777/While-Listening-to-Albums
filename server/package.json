@@ -1,0 +1,31 @@
+{
+  "name": "while-listening-to-albums-server",
+  "version": "1.0.0",
+  "description": "Express + MongoDB backend of While Listening to Albums",
+  "main": "src/app.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test mocha --timeout 100000 --recursive \"test/**/*.test.mjs\"",
+    "lint": "eslint src test",
+    "start": "node src/app.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.13.1",
+    "mongoose-slug-plugin": "^2.1.0",
+    "spotify-web-api-node": "^5.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "chai": "^5.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.21.0",
+    "eslint-plugin-mocha": "^10.5.0",
+    "globals": "^15.15.0",
+    "mocha": "^11.1.0",
+    "mongodb-memory-server": "^10.1.4"
+  }
+}
