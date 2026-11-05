@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../lib/api.js";
 import { useNavigate } from "react-router-dom";
+import SectionHead from "../components/SectionHead.jsx";
 
 export default function BlogNew() {
   const [title, setTitle] = useState("");
   const [cover, setCover] = useState("");
   const [content, setContent] = useState("");
   const [rate, setRate] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const [musics, setMusics] = useState([]);
   const [referredWorkFields, setReferredWorkFields] = useState([
@@ -18,7 +22,7 @@ export default function BlogNew() {
   useEffect(() => {
     apiFetch("/api/v1/music/all")
       .then((res) => res.json())
-      .then((data) => setMusics(data))
+      .then((data) => setMusics(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Failed to load music list:", err));
   }, []);
 
@@ -41,7 +45,7 @@ export default function BlogNew() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      alert("Title and content are required.");
+      setError("Title and content are required.");
       return;
     }
 
@@ -51,10 +55,12 @@ export default function BlogNew() {
       cover,
       content,
       rate: rate === "" ? 0 : parseFloat(rate),
-      referredWorkNumber: filteredReferredWork.length,
+      isPublic,
       referredWork: filteredReferredWork
     };
 
+    setError("");
+    setSubmitting(true);
     try {
       const res = await apiFetch("/api/v1/blog/create", {
         method: "POST",
@@ -63,78 +69,75 @@ export default function BlogNew() {
       });
 
       if (res.ok) {
-        alert("✅ Blog created!");
         navigate("/blog");
       } else {
         const err = await res.json();
-        alert("❌ Failed: " + err.error);
+        setError(err.error);
+        setSubmitting(false);
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Network error.");
+      setError("Network error.");
+      setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "2rem auto", padding: "2rem", background: "#fff", borderRadius: "10px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Write a New Blog</h1>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <input
-          type="text"
-          placeholder="Blog title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Cover image URL (default: cover of the first referred music)"
-          value={cover}
-          onChange={(e) => setCover(e.target.value)}
-        />
-        <textarea
-          placeholder="Write your content here..."
-          rows={8}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          style={{ resize: "vertical", fontSize: "1rem", padding: "0.75rem" }}
-        />
-        <input
-          type="number"
-          min="1"
-          max="10"
-          step="0.1"
-          placeholder="Rate this, 1-10, decimals are fine (optional)"
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-        />
+    <div className="l-narrow">
+      <SectionHead title="Write a New Blog" linkTo="/blog" linkLabel="My Blogs" />
 
-        <div>
-          <h3>Referred Music</h3>
+      <form onSubmit={handleSubmit} className="c-form">
+        <label className="c-field">
+          <span className="c-field__label">Title</span>
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </label>
+
+        <label className="c-field">
+          <span className="c-field__label">Content</span>
+          <textarea rows={12} value={content} onChange={(e) => setContent(e.target.value)} placeholder="What were you thinking while listening?" required />
+        </label>
+
+        <label className="c-field" style={{ maxWidth: 200 }}>
+          <span className="c-field__label">Rate, 1-10, decimals are fine (optional)</span>
+          <input type="number" min="1" max="10" step="0.1" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="8.5" />
+        </label>
+
+        <div className="c-field">
+          <span className="c-field__label">Referred music, from your list</span>
           {referredWorkFields.map((field, index) => (
-            <div key={index} style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "0.75rem" }}>
-              <select
-                value={field.item}
-                onChange={(e) => handleWorkChange(index, e.target.value)}
-              >
+            <div key={index} style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
+              <select value={field.item} onChange={(e) => handleWorkChange(index, e.target.value)} aria-label={`Referred music ${index + 1}`}>
                 <option value="">Select a music</option>
                 {musics.map(w => (
                   <option key={w._id} value={w._id}>
-                    {w.title} {w.artistName ? `- ${w.artistName}` : ""}
+                    {w.title} {w.artistName ? `/ ${w.artistName}` : ""}
                   </option>
                 ))}
               </select>
-
               {index > 0 && (
-                <button type="button" onClick={() => removeReferredWorkField(index)}>Remove</button>
+                <button type="button" className="c-text-button" onClick={() => removeReferredWorkField(index)}>Remove</button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addReferredWorkField}>+ Add one</button>
+          <div style={{ marginTop: 12 }}>
+            <button type="button" className="c-text-button c-underline" onClick={addReferredWorkField}>・Add one more</button>
+          </div>
         </div>
 
-        <button type="submit">Submit Blog</button>
+        <label className="c-field">
+          <span className="c-field__label">Cover image URL (default: cover of the first referred music)</span>
+          <input type="text" value={cover} onChange={(e) => setCover(e.target.value)} />
+        </label>
+
+        <label className="c-checkbox">
+          <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
+          Public: other users can read this blog with its link (private by default)
+        </label>
+
+        {error && <p className="c-message c-message--error">{error}</p>}
+        <div className="c-form__actions">
+          <button type="submit" className="c-pill c-pill--fill" disabled={submitting}>{submitting ? "Submitting" : "Submit Blog"}</button>
+        </div>
       </form>
     </div>
   );

@@ -1,18 +1,22 @@
 import express from "express";
-import { Artist, Music } from "../models/db.mjs";
+import { Artist, Music, Mark } from "../models/db.mjs";
+import { requireAuth } from "../middleware/auth.mjs";
 import { searchSpotifyAlbums, getSpotifyArtistImage } from "../services/spotify.mjs";
 import { isNeteaseAlbumUrl, getNeteaseAlbum, searchNeteaseAlbums } from "../services/netease.mjs";
 import { mergeResults } from "../services/merge.mjs";
 const router = express.Router();
 
+// everything here belongs to a logged-in user
+router.use(requireAuth);
+
 router.get('/all', async (req, res) => {
-  // show all music
+  // show all music that this user has marked, newest first
   try {
-    const music = await Music.find();
-    res.json(music);
+    const marks = await Mark.find({ user: req.user._id }).sort({ createDate: -1 }).populate("music");
+    res.json(marks.filter(mark => mark.music).map(mark => ({ ...mark.music.toObject(), markedDate: mark.createDate })));
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error retrieving music');
+    res.status(500).json({ error: 'Error retrieving music' });
   }
 });
 // Specific Music Detail Page
@@ -22,7 +26,23 @@ router.get('/:slug', async (req, res) => {
     if (!music) {
       return res.status(404).json({ error: 'Music not found' });
     }
-    res.json(music);
+    const mark = await Mark.exists({ user: req.user._id, music: music._id });
+    res.json({ ...music.toObject(), inLibrary: Boolean(mark) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Remove a music from my list, the music itself stays in the catalog
+router.delete('/:slug', async (req, res) => {
+  try {
+    const music = await Music.findOne({ slug: req.params.slug });
+    const result = music && await Mark.deleteOne({ user: req.user._id, music: music._id });
+    if (!result || result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Music is not in your list' });
+    }
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
@@ -111,36 +131,51 @@ async function resolveArtists(rawArtists, artistName) {
   return artistObjectIds;
 }
 
-// Add Music
+// the same music may already be in the catalog because another user added it
+async function findInCatalog({ spotifyId, neteaseId, title, artistName }) {
+  const conditions = [{ title, artistName }];
+  if (spotifyId) {
+    conditions.push({ spotifyId });
+  }
+  if (neteaseId) {
+    conditions.push({ neteaseId });
+  }
+  return Music.findOne({ $or: conditions });
+}
+
+// Add Music to my list
 router.post('/add', async (req, res) => {
-  const { title, spotifyId, spotifyUrl, neteaseId, neteaseUrl, image, type, totalTracks, releaseDate, description, artistName, rawArtists } = req.body;
-  if (!title) {
+  const fields = {};
+  for (const key of ["title", "spotifyId", "spotifyUrl", "neteaseId", "neteaseUrl", "image", "type", "releaseDate", "description", "artistName"]) {
+    fields[key] = typeof req.body[key] === "string" ? req.body[key] : "";
+  }
+  const rawArtists = Array.isArray(req.body.rawArtists) ? req.body.rawArtists : [];
+  if (!fields.title) {
     return res.status(400).json({ error: "Title is required" });
   }
 
   try {
-    const existingMusic = await Music.findOne({ title, artistName });
-    if (existingMusic) {
-      return res.status(400).json({ error: "Music already exists" });
+    let music = await findInCatalog(fields);
+    if (!music) {
+      music = await Music.create({
+        ...fields,
+        totalTracks: Number(req.body.totalTracks) || 0,
+        releaseDate: fields.releaseDate || undefined,
+        artists: await resolveArtists(rawArtists, fields.artistName),
+      });
+    } else {
+      // this search may know a streaming link that the catalog does not have yet
+      for (const key of ["spotifyId", "spotifyUrl", "neteaseId", "neteaseUrl"]) {
+        music[key] = music[key] || fields[key];
+      }
+      await music.save();
     }
 
-    const newMusic = new Music({
-      title,
-      spotifyId,
-      spotifyUrl,
-      neteaseId,
-      neteaseUrl,
-      image,
-      type,
-      totalTracks,
-      releaseDate: releaseDate || undefined,
-      description,
-      artistName,
-      artists: await resolveArtists(rawArtists || [], artistName),
-    });
-
-    await newMusic.save();
-    return res.status(201).json({ success: true, message: "Music added with artist", slug: newMusic.slug });
+    if (await Mark.exists({ user: req.user._id, music: music._id })) {
+      return res.status(400).json({ error: "Music is already in your list" });
+    }
+    await Mark.create({ user: req.user._id, music: music._id });
+    return res.status(201).json({ success: true, message: "Music added", slug: music.slug });
   } catch (err) {
     console.error("Failed to add music:", err);
     return res.status(500).json({ error: "Failed to add music" });

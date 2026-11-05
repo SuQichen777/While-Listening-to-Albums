@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiFetch } from "../lib/api.js";
+import { formatDate, coverUrl } from "../lib/format.js";
 
 export default function BlogDetail() {
   const { slug } = useParams();
@@ -13,52 +14,53 @@ export default function BlogDetail() {
       .catch((err) => console.error("Error fetching blog detail:", err));
   }, [slug]);
 
-  if (!blog) return <div>Loading...</div>;
-  if (blog.error) return <div>{blog.error}</div>;
+  if (!blog) return <p className="c-message">Loading</p>;
+  if (blog.error) return <p className="c-empty">{blog.error}</p>;
+
+  const works = (blog.referredWork || []).filter((work) => work.item);
 
   return (
-    <div className="blog-detail-container">
-      <h1 className="blog-detail-title">{blog.title}</h1>
-
-      {blog.cover && (
-        <div className="blog-detail-cover-wrapper">
-          <img referrerPolicy="no-referrer" src={blog.cover} alt={blog.title} className="blog-detail-cover" />
+    <article className="l-narrow">
+      <header className="p-blog__head">
+        <div>
+          <h1 className="p-blog__title reveal">{blog.title}</h1>
+          <div className="c-tags reveal" style={{ "--i": 1 }}>
+            {blog.isMine
+              ? <span className={blog.isPublic ? "c-tag c-tag--fill" : "c-tag"}>{blog.isPublic ? "Public" : "Private"}</span>
+              : <span className="c-tag c-tag--fill">By {blog.author?.username}</span>}
+            <span className="c-date">{formatDate(blog.createDate)}</span>
+          </div>
+          {blog.rate > 0 && (
+            <p className="p-blog__rate reveal" style={{ "--i": 2 }}>{blog.rate}<small>/ 10</small></p>
+          )}
         </div>
-      )}
-
-      <div className="blog-detail-meta">
-        <p><strong>Created:</strong> {new Date(blog.createDate).toLocaleDateString()}</p>
-        {blog.rate > 0 && (
-          <p><strong>Rate:</strong> {blog.rate} / 10</p>
+        {blog.cover && (
+          <img referrerPolicy="no-referrer" src={coverUrl(blog.cover, 600)} alt="" className="p-blog__cover reveal" style={{ "--i": 3 }} />
         )}
-      </div>
+      </header>
 
-      <div className="blog-detail-content">
-        {blog.content || "No content."}
-      </div>
+      <p className="c-prose">{blog.content || "No content."}</p>
 
-      {blog.referredWork && blog.referredWork.length > 0 && (
-        <div className="blog-detail-referred">
-          <h2>Referred Works</h2>
-          <ul>
-            {blog.referredWork.map((work, index) => (
-              <li key={index}>
-                {work.item && (
-                  <Link to={`/music/${work.item.slug}`} className="referred-item">
-                    {work.item.image && (
-                      <img referrerPolicy="no-referrer" src={work.item.image} alt={work.item.title || "Work"} className="referred-image" />
-                    )}
-                    <div className="referred-info">
-                      <p><strong>Title:</strong> {work.item.title || "Untitled"}</p>
-                      <p><strong>Artist:</strong> {work.item.artistName || "Unknown"}</p>
-                    </div>
-                  </Link>
-                )}
+      {works.length > 0 && (
+        <section className="p-blog__referred">
+          <h2 className="c-subhead">Referred Music</h2>
+          <ul className="c-list">
+            {works.map((work, index) => (
+              <li key={index} className="c-list__item">
+                <Link to={`/music/${work.item.slug}`} className="c-list__row">
+                  {work.item.image && (
+                    <img referrerPolicy="no-referrer" src={coverUrl(work.item.image, 200)} alt="" className="c-list__image" />
+                  )}
+                  <div className="c-list__body">
+                    <p className="c-list__title">{work.item.title || "Untitled"}</p>
+                    <p className="c-list__sub">{work.item.artistName || "Unknown"}</p>
+                  </div>
+                </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
-    </div>
+    </article>
   );
 }
